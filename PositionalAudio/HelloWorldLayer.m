@@ -8,6 +8,9 @@
 
 #import "HelloWorldLayer.h"
 #import "CDXAudioNode.h"
+#import "SimpleAudioEngine.h"
+
+#define USE_SIMPLE_AUDIO_ENGINE YES
 
 @implementation HelloWorldLayer
 
@@ -30,26 +33,10 @@
         
         self.isTouchEnabled = YES;
         
-        // Sound initialization
-        
-        [CDSoundEngine setMixerSampleRate:CD_SAMPLE_RATE_MID];
-        [CDAudioManager initAsynchronously:kAMM_FxPlusMusicIfNoOtherAudio];
-        
-        // Waits for initialization (BAD way to do it, used here for simplicity's sake!)
-        
-        while ([CDAudioManager sharedManagerState] != kAMStateInitialised) {}
-        
-        am = [CDAudioManager sharedManager];
-        soundEngine = [CDAudioManager sharedManager].soundEngine;
-        
-        NSArray *defs = [NSArray arrayWithObjects:
-                         [NSNumber numberWithInt:3], nil];
-        [soundEngine defineSourceGroups:defs];
-        
         // Creates the sprites
         
 		CGSize size = [[CCDirector sharedDirector] winSize];
-	
+        
         CCSprite *earSprite = [CCSprite spriteWithFile:@"user_green.png"];
         earSprite.position = ccp(size.width / 2, size.height / 2);
         
@@ -70,34 +57,84 @@
         [self addChild:soundSprite2];
         [self addChild:soundSprite3];
         
-        // Machinegun sound configured for single play (tap the sprite to play again). Attached
-        // to soundSprite1, using earSprite as the listener location;
+        // Sound initialization
         
-        CDXAudioNode *audioNode = [CDXAudioNode audioNodeWithFile:@"machinegun.caf" soundEngine:soundEngine sourceId:0];
-        audioNode.earNode = earSprite;
-        [soundSprite1 addChild:audioNode];
-        [audioNode play];
-        
-        // Music configured for continuous looping. Attached to soundSprite2, using earSprite 
-        // as the listener location;
-        
-        audioNode = [CDXAudioNode audioNodeWithFile:@"808_120bpm.caf" soundEngine:soundEngine sourceId:1];
-        audioNode.earNode = earSprite;
-        audioNode.playMode = kAudioNodeLoop;
-        [soundSprite2 addChild:audioNode];
-        [audioNode play];
-        
-        // Voice configured for intermitent looping. Attached to soundSprite3, using earSprite 
-        // as the listener location;
-        
-        audioNode = [CDXAudioNode audioNodeWithFile:@"dp2.caf" soundEngine:soundEngine sourceId:2];
-        audioNode.earNode = earSprite;
-        audioNode.minLoopFrequency = 2.0f;
-        audioNode.maxLoopFrequency = 4.0f;
-        audioNode.playMode = kAudioNodePeriodicLoop;
-        [soundSprite3 addChild:audioNode];
-        [audioNode play];
-        
+        if (USE_SIMPLE_AUDIO_ENGINE) {
+            
+            [SimpleAudioEngine sharedEngine]; // Forces initialization
+            
+            // Machinegun sound configured for single play (tap the sprite to play again). Attached
+            // to soundSprite1, using earSprite as the listener location;
+            
+            CDXAudioNode *audioNode = [CDXAudioNode audioNodeWithFile:@"machinegun.caf"];
+            audioNode.earNode = earSprite;
+            [soundSprite1 addChild:audioNode];
+            [audioNode play];
+            
+            // Music configured for continuous looping. Attached to soundSprite2, using earSprite 
+            // as the listener location;
+            
+            audioNode = [CDXAudioNode audioNodeWithFile:@"808_120bpm.caf"];
+            audioNode.earNode = earSprite;
+            audioNode.playMode = kAudioNodeLoop;
+            [soundSprite2 addChild:audioNode];
+            [audioNode play];
+            
+            // Voice configured for intermitent looping. Attached to soundSprite3, using earSprite 
+            // as the listener location;
+            
+            audioNode = [CDXAudioNode audioNodeWithFile:@"dp2.caf"];
+            audioNode.earNode = earSprite;
+            audioNode.minLoopFrequency = 2.0f;
+            audioNode.maxLoopFrequency = 4.0f;
+            audioNode.playMode = kAudioNodePeriodicLoop;
+            [soundSprite3 addChild:audioNode];
+            [audioNode play];
+            
+        } else {
+            
+            [CDSoundEngine setMixerSampleRate:CD_SAMPLE_RATE_MID];
+            [CDAudioManager initAsynchronously:kAMM_FxPlusMusicIfNoOtherAudio];
+            
+            // Waits for initialization (BAD way to do it, used here for simplicity's sake!)
+            
+            while ([CDAudioManager sharedManagerState] != kAMStateInitialised) {}
+            
+            am = [CDAudioManager sharedManager];
+            soundEngine = [CDAudioManager sharedManager].soundEngine;
+            
+            NSArray *defs = [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:3], nil];
+            [soundEngine defineSourceGroups:defs];
+            
+            // Machinegun sound configured for single play (tap the sprite to play again). Attached
+            // to soundSprite1, using earSprite as the listener location;
+            
+            CDXAudioNode *audioNode = [CDXAudioNode audioNodeWithFile:@"machinegun.caf" soundEngine:soundEngine sourceId:0];
+            audioNode.earNode = earSprite;
+            [soundSprite1 addChild:audioNode];
+            [audioNode play];
+            
+            // Music configured for continuous looping. Attached to soundSprite2, using earSprite 
+            // as the listener location;
+            
+            audioNode = [CDXAudioNode audioNodeWithFile:@"808_120bpm.caf" soundEngine:soundEngine sourceId:1];
+            audioNode.earNode = earSprite;
+            audioNode.playMode = kAudioNodeLoop;
+            [soundSprite2 addChild:audioNode];
+            [audioNode play];
+            
+            // Voice configured for intermitent looping. Attached to soundSprite3, using earSprite 
+            // as the listener location;
+            
+            audioNode = [CDXAudioNode audioNodeWithFile:@"dp2.caf" soundEngine:soundEngine sourceId:2];
+            audioNode.earNode = earSprite;
+            audioNode.minLoopFrequency = 2.0f;
+            audioNode.maxLoopFrequency = 4.0f;
+            audioNode.playMode = kAudioNodePeriodicLoop;
+            [soundSprite3 addChild:audioNode];
+            [audioNode play];
+        }
 	}
 	return self;
 }

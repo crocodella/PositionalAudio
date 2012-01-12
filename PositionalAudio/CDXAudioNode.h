@@ -64,6 +64,8 @@ typedef enum {
 
 + (CDXAudioNode *)audioNodeWithFile:(NSString *)file soundEngine:(CDSoundEngine *)se sourceId:(int)sId;
 
++ (CDXAudioNode *)audioNodeWithFile:(NSString *)file;
+
 /**
  Initializes the audio node with an already created sound buffer, identified by
  the sourceId.
@@ -75,6 +77,11 @@ typedef enum {
  specified sourceId.
  */
 - (id)initWithFile:(NSString *)file soundEngine:(CDSoundEngine *)se sourceId:(int)sId;
+
+/**
+ Initializes the audio node with an audio file using SimpleAudioEngine
+ */
+- (id)initWithFile:(NSString *)file;
 
 - (void)play;
 
